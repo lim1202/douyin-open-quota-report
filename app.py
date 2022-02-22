@@ -8,11 +8,17 @@ from urllib.parse import quote
 class DouyinOpenQuotaReport(object):
     """抖音开放平台配额提醒"""
 
-    def __init__(self):
-        self.DINGTALK_BOT_KEYWORD = os.environ["DINGTALK_BOT_KEYWORD"]
-        self.DINGTALK_BOT_TOKEN = os.environ["DINGTALK_BOT_TOKEN"]
-        self.DOUYIN_CLIENT_KEY = os.environ["DOUYIN_CLIENT_KEY"]
-        self.DOUYIN_COOKIES = os.environ["DOUYIN_COOKIES"]
+    def __init__(
+        self,
+        dingtalk_bot_keyword,
+        dingtalk_bot_token,
+        douyin_client_key,
+        douyin_cookies,
+    ):
+        self.DINGTALK_BOT_KEYWORD = dingtalk_bot_keyword
+        self.DINGTALK_BOT_TOKEN = dingtalk_bot_token
+        self.DOUYIN_CLIENT_KEY = douyin_client_key
+        self.DOUYIN_COOKIES = douyin_cookies
 
     def get_url(self, type=None):
         domain = "https://open.douyin.com/aweme/v2/platform/app/quota"
@@ -159,4 +165,25 @@ class DouyinOpenQuotaReport(object):
 
 
 if __name__ == "__main__":
-    DouyinOpenQuotaReport().run()
+    if not os.environ.get("DINGTALK_BOT_KEYWORD"):
+        print("❌ 未设置钉钉机器人关键字")
+        sys.exit("Please set DINGTALK_BOT_KEYWORD")
+
+    if not os.environ.get("DINGTALK_BOT_TOKEN"):
+        print("❌ 未设置钉钉机器人 Token")
+        sys.exit("Please set DINGTALK_BOT_TOKEN")
+
+    if not os.environ.get("DOUYIN_CLIENT_KEY"):
+        print("❌ 未设置抖音 Client Key")
+        sys.exit("Please set DOUYIN_CLIENT_KEY")
+
+    if not os.environ.get("DOUYIN_COOKIES"):
+        print("❌ 未设置抖音 Cookies")
+        sys.exit("Please set DOUYIN_COOKIES")
+
+    DouyinOpenQuotaReport(
+        os.environ["DINGTALK_BOT_KEYWORD"],
+        os.environ["DINGTALK_BOT_TOKEN"],
+        os.environ["DOUYIN_CLIENT_KEY"],
+        os.environ["DOUYIN_COOKIES"],
+    ).run()
