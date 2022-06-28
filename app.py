@@ -60,7 +60,9 @@ class DouyinOpenQuotaReport(object):
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
             "cookie": self.DOUYIN_COOKIES,
-            "Referer": "https://open.douyin.com/platform/management/app/data/awg72nd8hms1s9bd",
+            "Referer": "https://open.douyin.com/platform/management/app/data/{}".format(
+                self.DOUYIN_CLIENT_KEY
+            ),
             "Referrer-Policy": "strict-origin-when-cross-origin",
         }
 
