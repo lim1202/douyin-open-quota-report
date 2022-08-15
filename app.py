@@ -117,6 +117,7 @@ class DouyinOpenQuotaReport(object):
                 text += "- 剩余有效期/有效期: {}/{}\n".format(
                     package["remain_time_by_day"], package["total_time_by_day"]
                 )
+                text += "\n"
         else:
             text += "## 💰 暂无套餐\n请确认是否已失效\n"
 
