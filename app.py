@@ -27,7 +27,7 @@ class DouyinOpenQuotaReport(object):
                 self.DOUYIN_CLIENT_KEY
             )
         elif type == "package":
-            return "{}/package/list/?client_key={}&page=1&page_size=5&_t={}".format(
+            return "{}/package/list/?client_key={}&page=1&page_size=10&_t={}".format(
                 domain, self.DOUYIN_CLIENT_KEY, int(datetime.now().timestamp())
             )
         elif type == "service":
@@ -35,7 +35,7 @@ class DouyinOpenQuotaReport(object):
                 domain, self.DOUYIN_CLIENT_KEY, int(datetime.now().timestamp())
             )
         else:
-            return None
+            return "" 
 
     def get_dingtalk_webhook(self):
         return "https://oapi.dingtalk.com/robot/send?access_token={}".format(
@@ -67,15 +67,17 @@ class DouyinOpenQuotaReport(object):
         }
 
     def quota_package_list(self):
+        response = None
         try:
-            r = requests.get(self.get_url("package"), headers=self.get_headers())
-            quota_package_list = r.json()["data"]["quota_package_list"]
+            response = requests.get(self.get_url("package"), headers=self.get_headers())
+            quota_package_list = response.json()["data"]["quota_package_list"]
             quota_package_list = [
                 package for package in quota_package_list if package["remain_count"] > 0
             ]
             return quota_package_list
         except:
-            print("⚠️ 接口响应格式错误, 返回值: {}".format(r.text))
+            result = response.text if response is not None else ""
+            print("⚠️ 接口响应格式错误, 返回值: {}".format(result))
             return None
 
     def quota_service(self):
