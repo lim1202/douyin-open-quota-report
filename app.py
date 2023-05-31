@@ -1,8 +1,10 @@
-import sys
 import os
-import requests
+import sys
 from datetime import datetime
 from urllib.parse import quote
+
+import requests
+from dotenv import load_dotenv
 
 
 class DouyinOpenQuotaReport(object):
@@ -21,21 +23,15 @@ class DouyinOpenQuotaReport(object):
         self.DOUYIN_COOKIES = douyin_cookies
 
     def get_url(self, type=None):
-        domain = "https://open.douyin.com/aweme/v2/platform/app/quota"
+        domain = f"https://developer.open-douyin.com/bff_api/app/mobileindexpage/v2/{self.DOUYIN_CLIENT_KEY}/awemeopenplatformapi"
         if type == "platform":
-            return "https://open.douyin.com/platform/management/app/data/{}".format(
-                self.DOUYIN_CLIENT_KEY
-            )
+            return f"https://developer.open-douyin.com/webapp/{self.DOUYIN_CLIENT_KEY}/indexpage"
         elif type == "package":
-            return "{}/package/list/?client_key={}&page=1&page_size=10&_t={}".format(
-                domain, self.DOUYIN_CLIENT_KEY, int(datetime.now().timestamp())
-            )
+            return f"{domain}/getAppQuotaPackageListV2?appid={self.DOUYIN_CLIENT_KEY}&client_key={self.DOUYIN_CLIENT_KEY}&page=1&page_size=20"
         elif type == "service":
-            return "{}/service/list/?client_key={}&_t={}".format(
-                domain, self.DOUYIN_CLIENT_KEY, int(datetime.now().timestamp())
-            )
+            return f"{domain}/getAppQuotaServiceListV2?appid={self.DOUYIN_CLIENT_KEY}&client_key={self.DOUYIN_CLIENT_KEY}"
         else:
-            return "" 
+            return ""
 
     def get_dingtalk_webhook(self):
         return "https://oapi.dingtalk.com/robot/send?access_token={}".format(
@@ -49,21 +45,11 @@ class DouyinOpenQuotaReport(object):
 
     def get_headers(self):
         return {
-            "accept": "application/json, text/plain, */*",
-            "accept-language": "en,zh-CN;q=0.9,zh;q=0.8,en-HK;q=0.7,ja-JP;q=0.6,ja;q=0.5,en-US;q=0.4,zh-TW;q=0.3",
-            "cache-control": "no-cache",
-            "pragma": "no-cache",
-            "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": '"macOS"',
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "cookie": self.DOUYIN_COOKIES,
-            "Referer": "https://open.douyin.com/platform/management/app/data/{}".format(
-                self.DOUYIN_CLIENT_KEY
-            ),
-            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6,ja;q=0.5",
+            "Cookie": self.DOUYIN_COOKIES,
+            "Referer": self.get_url("platform"),
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
         }
 
     def quota_package_list(self):
@@ -170,6 +156,9 @@ class DouyinOpenQuotaReport(object):
 
 
 if __name__ == "__main__":
+    if __debug__:
+        load_dotenv()
+
     if not os.environ.get("DINGTALK_BOT_KEYWORD"):
         print("❌ 未设置钉钉机器人关键字")
         sys.exit("Please set DINGTALK_BOT_KEYWORD")
